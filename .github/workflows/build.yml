@@ -23,9 +23,7 @@ jobs:
             --install "platforms;android-34" "build-tools;34.0.0" >/dev/null
 
       - name: Build APK
-        env:
-          ANDROID_SDK: ${{ env.ANDROID_HOME }}
-        run: ./android/build.sh
+        run: ANDROID_SDK="$ANDROID_HOME" ./android/build.sh
 
       - uses: actions/upload-artifact@v4
         with:

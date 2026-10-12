@@ -16,10 +16,11 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - uses: android-actions/setup-android@v3
-
       - name: Install SDK packages
-        run: sdkmanager --install "platforms;android-34" "build-tools;34.0.0" >/dev/null
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            --install "platforms;android-34" "build-tools;34.0.0" >/dev/null
 
       - name: Build APK
         env:

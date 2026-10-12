@@ -1,21 +1,39 @@
 #include <pebble.h>
 
-#define ACTION_COUNT 5
+#define ACTION_COUNT 14
 
 static const char *s_commands[ACTION_COUNT] = {
     "ring",
+    "ring long",
     "locate",
+    "locate last",
+    "locate gps",
+    "stats",
     "lock",
     "flash",
+    "ringermode silent",
+    "ringermode normal",
     "nodisturb on",
+    "nodisturb off",
+    "bluetoothscan",
+    "camera front",
 };
 
 static const char *s_labels[ACTION_COUNT] = {
     "Ring",
+    "Ring 3min",
     "Locate",
+    "Locate fast",
+    "Locate GPS",
+    "Stats",
     "Lock",
     "Flash",
+    "Silent",
+    "Normal",
     "DND on",
+    "DND off",
+    "BT scan",
+    "Camera",
 };
 
 static Window *s_window;

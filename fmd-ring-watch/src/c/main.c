@@ -187,6 +187,10 @@ static void draw_action(Layer *layer, GContext *ctx) {
   const char *title = s_titles[s_selected];
   const char *sub = s_subs[s_selected];
 
+  // Raw draws use the GContext's default text color, not black: set it or
+  // everything renders invisible (status TextLayer sets its own color).
+  graphics_context_set_text_color(ctx, GColorBlack);
+
   GSize t_used = { 0, 0 };
   GFont t_font = pick_font(title, max_w, &t_used);
 

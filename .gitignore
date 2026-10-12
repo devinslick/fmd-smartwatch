@@ -1,0 +1,8 @@
+# Build artifacts
+android/build/
+android/classes.dex
+android/FMDRing.apk
+android/FMDRing.apk.idsig
+fmd-ring-watch/build/
+fmd-ring-watch/.lock-waf*
+**/node_modules/

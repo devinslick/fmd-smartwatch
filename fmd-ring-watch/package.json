@@ -1,0 +1,44 @@
+{
+  "name": "fmd-ring",
+  "author": "Devin Slick",
+  "version": "1.2.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "FMD Ring",
+    "uuid": "39084eff-db47-473c-b1af-eb44fdbaa8b5",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "companionApp": {
+      "android": {
+        "url": "local-build",
+        "apps": [
+          {
+            "package": "com.devinslick.fmdring"
+          }
+        ]
+      }
+    },
+    "messageKeys": [
+      "Cmd",
+      "Result"
+    ],
+    "resources": {
+      "media": []
+    },
+    "capabilities": []
+  }
+}

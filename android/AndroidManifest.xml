@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.devinslick.fmdring"
+    android:versionCode="8"
+    android:versionName="0.6.0">
+
+    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:label="FMD Ring"
+        android:allowBackup="false"
+        android:theme="@android:style/Theme.Material">
+
+        <activity android:name=".MainActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- THE trigger: fire from anything.
+             adb shell am broadcast -a com.devinslick.fmdring.action.RING -->
+        <receiver android:name=".RingReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="com.devinslick.fmdring.action.RING" />
+            </intent-filter>
+        </receiver>
+
+        <!-- FMD command results arrive via the command notification's reply action -->
+        <receiver android:name=".ReplyReceiver" android:exported="false" />
+
+        <!-- New RePebble Pebble app: PebbleKit 2 companion delivery -->
+        <service
+            android:name=".FmdPebbleService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="io.rebble.pebblekit2.RECEIVE_DATA_FROM_WATCH" />
+            </intent-filter>
+        </service>
+
+        <!-- Classic Pebble AppMessage companion delivery -->
+        <receiver android:name=".PebbleReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="com.getpebble.action.app_received" />
+                <action android:name="com.getpebble.action.APP_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".BootReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

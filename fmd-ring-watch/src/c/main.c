@@ -1,6 +1,6 @@
 #include <pebble.h>
 
-#define ACTION_COUNT 14
+#define ACTION_COUNT 15
 
 static const char *s_commands[ACTION_COUNT] = {
     "ring",
@@ -17,51 +17,89 @@ static const char *s_commands[ACTION_COUNT] = {
     "nodisturb off",
     "bluetoothscan",
     "camera front",
+    "camera back",
 };
 
-static const char *s_labels[ACTION_COUNT] = {
+static const char *s_titles[ACTION_COUNT] = {
     "Ring",
-    "Ring 3min",
+    "Ring",
     "Locate",
-    "Locate fast",
-    "Locate GPS",
+    "Locate",
+    "Locate",
     "Stats",
     "Lock",
     "Flash",
-    "Silent",
-    "Normal",
-    "DND on",
-    "DND off",
-    "BT scan",
+    "Ringer",
+    "Ringer",
+    "DND",
+    "DND",
+    "Scan",
+    "Camera",
     "Camera",
 };
 
+static const char *s_subs[ACTION_COUNT] = {
+    "",
+    "3min",
+    "",
+    "last known",
+    "GPS",
+    "",
+    "",
+    "",
+    "silent",
+    "normal",
+    "on",
+    "off",
+    "Bluetooth",
+    "Front",
+    "Back",
+};
+
 static Window *s_window;
-static TextLayer *s_action;
+static Layer *s_action_layer;
 static TextLayer *s_status;
 static char s_status_buf[128];
 static int s_selected = 0;
 static bool s_waiting = false;
+static AppTimer *s_status_timer = NULL;
+
+static const char *STATUS_HELP = "UP/DN: pick\nSELECT: fire";
 
 static void update_status(const char *msg) {
   snprintf(s_status_buf, sizeof(s_status_buf), "%s", msg);
   text_layer_set_text(s_status, s_status_buf);
 }
 
+// Terminal statuses clear back to the help text after a short hold instead of
+// staying on screen forever.
+static void status_reset_cb(void *data) {
+  s_status_timer = NULL;
+  update_status(STATUS_HELP);
+}
+
+static void update_status_final(const char *msg) {
+  update_status(msg);
+  if (s_status_timer) {
+    app_timer_cancel(s_status_timer);
+  }
+  s_status_timer = app_timer_register(5000, status_reset_cb, NULL);
+}
+
 static void noack_callback(void *data) {
   if (s_waiting) {
-    update_status("Sent\n(no ack)");
+    update_status_final("Sent\n(no ack)");
   }
 }
 
 static void outbox_failed_callback(DictionaryIterator *iter, AppMessageResult reason, void *context) {
-  update_status("send failed");
+  update_status_final("send failed");
 }
 
 static void outbox_sent_callback(DictionaryIterator *iter, void *context) {
   s_waiting = false;
   // Phone-side companion accepted the command.
-  update_status("Fired!");
+  update_status_final("Fired!");
 }
 
 static void send_command(void) {
@@ -83,7 +121,7 @@ static void send_command(void) {
 }
 
 static void render_selection(void) {
-  text_layer_set_text(s_action, s_labels[s_selected]);
+  layer_mark_dirty(s_action_layer);
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -111,33 +149,88 @@ static void inbox_received_callback(DictionaryIterator *iter, void *context) {
   if (t && t->value->cstring[0] != '\0') {
     s_waiting = false;
     // Copy immediately: tuple strings are only valid inside this callback.
-    update_status(t->value->cstring);
+    update_status_final(t->value->cstring);
   }
 }
 
 static void inbox_dropped_callback(AppMessageResult reason, void *context) {
-  update_status("reply dropped");
+  update_status_final("reply dropped");
+}
+
+// Largest system font at which the label still fits on a single line.
+// heights[] is each font's approximate single-line height: measuring with
+// word-wrap, a used height at or below it means "no wrap" -> this font wins.
+static GFont pick_font(const char *text, int16_t max_w, GSize *used_out) {
+  const char *keys[] = {
+    FONT_KEY_BITHAM_42_BOLD, FONT_KEY_GOTHIC_28_BOLD,
+    FONT_KEY_GOTHIC_24_BOLD, FONT_KEY_GOTHIC_18_BOLD,
+  };
+  const int heights[] = { 50, 34, 30, 24 };
+  GFont font = NULL;
+  GSize used = { 0, 0 };
+  for (size_t i = 0; i < sizeof(keys) / sizeof(keys[0]); i++) {
+    font = fonts_get_system_font(keys[i]);
+    used = graphics_text_layout_get_content_size(
+        text, font, GRect(0, 0, max_w, 2000),
+        GTextOverflowModeWordWrap, GTextAlignmentLeft);
+    if (used.h <= heights[i]) {
+      break;
+    }
+  }
+  *used_out = used;
+  return font;
+}
+
+static void draw_action(Layer *layer, GContext *ctx) {
+  GRect bounds = layer_get_bounds(layer);
+  const int16_t max_w = bounds.size.w - 8;
+  const char *title = s_titles[s_selected];
+  const char *sub = s_subs[s_selected];
+
+  GSize t_used = { 0, 0 };
+  GFont t_font = pick_font(title, max_w, &t_used);
+
+  GFont sub_font = fonts_get_system_font(FONT_KEY_GOTHIC_18);
+  GSize sub_used = { 0, 0 };
+  if (sub[0] != '\0') {
+    sub_used = graphics_text_layout_get_content_size(
+        sub, sub_font, GRect(0, 0, max_w, 2000),
+        GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter);
+  }
+
+  const int16_t block_h = t_used.h + (sub_used.h ? 2 + sub_used.h : 0);
+  const int16_t y0 = bounds.origin.y + (bounds.size.h - block_h) / 2;
+  graphics_draw_text(ctx, title, t_font,
+                     GRect(4, y0, max_w, t_used.h + 2),
+                     GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+  if (sub_used.h) {
+    graphics_draw_text(ctx, sub, sub_font,
+                       GRect(4, y0 + t_used.h + 2, max_w, sub_used.h + 2),
+                       GTextOverflowModeTrailingEllipsis, GTextAlignmentCenter, NULL);
+  }
 }
 
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
 
-  s_action = text_layer_create(GRect(0, 30, bounds.size.w, 50));
-  text_layer_set_text(s_action, s_labels[0]);
-  text_layer_set_font(s_action, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD));
-  text_layer_set_text_alignment(s_action, GTextAlignmentCenter);
-  layer_add_child(window_layer, text_layer_get_layer(s_action));
+  s_action_layer = layer_create(GRect(0, 16, bounds.size.w, 76));
+  layer_set_update_proc(s_action_layer, draw_action);
+  layer_add_child(window_layer, s_action_layer);
 
   s_status = text_layer_create(GRect(8, 92, bounds.size.w - 16, 110));
-  text_layer_set_text(s_status, "UP/DN: pick\nSELECT: fire");
+  text_layer_set_text(s_status, STATUS_HELP);
   text_layer_set_font(s_status, fonts_get_system_font(FONT_KEY_GOTHIC_18));
   text_layer_set_text_alignment(s_status, GTextAlignmentCenter);
   layer_add_child(window_layer, text_layer_get_layer(s_status));
 }
 
 static void window_unload(Window *window) {
-  text_layer_destroy(s_action);
+  if (s_status_timer) {
+    app_timer_cancel(s_status_timer);
+    s_status_timer = NULL;
+  }
+  layer_destroy(s_action_layer);
   text_layer_destroy(s_status);
 }
 

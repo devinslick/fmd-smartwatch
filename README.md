@@ -10,7 +10,9 @@ Two components:
   only: exported manifest receivers/services that Android spawns on demand.
   No persistent process, no server, no sockets.
 - **`fmd-ring-watch/`** — "FMD Ring" Pebble watchapp (C, SDK 3, all classic
-  platforms). Action menu: Ring (default) / Locate / Lock / Flash / DND on.
+  platforms). Action list: Ring / Locate (plain, last known, GPS) / Stats /
+  Lock / Flash / Ringer mode / DND / BT scan / Camera (front + back) — short
+  titles with small-text subtitles so nothing truncates on 144px screens.
 
 ## How it works
 

@@ -4,9 +4,9 @@ Trigger [Find My Device (FMD)](https://gitlab.com/fmd-foss/fmd-android) commands
 from a smartwatch — fully offline, over the watch's existing Bluetooth
 connection to the phone. One repo per platform under one roof:
 
-- **`android/`** — the bridge APK ("FMD Ring"). A ~25 KB gradle-free Android
-  app. Trigger-based only: exported manifest receivers/services that Android
-  spawns on demand. No persistent process, no server, no sockets.
+- **`android/`** — the bridge APK ("FMD Watch Bridge"). A ~25 KB gradle-free
+  Android app. Trigger-based only: exported manifest receivers/services that
+  Android spawns on demand. No persistent process, no server, no sockets.
 - **`pebble/`** — "FMD Remote", the Pebble watchapp (C, SDK 3, all classic
   platforms). Action list: Ring / Locate (plain, last known, GPS) / Stats /
   Lock / Flash / Ringer mode / DND / BT scan / Camera (front + back) — short
@@ -77,10 +77,14 @@ service to FMD itself, removing the bridge from the loop:
 ## Install order (always)
 
 1. If your FMD build does not yet include the PebbleKit 2 companion service
-   (MR !542 pending — i.e., any stock release): sideload `FMDRing.apk` (the
-   bridge). In-place updates keep settings.
-2. Sideload the `.pbw`. The Pebble app reads the companion package
-   (`companionApp` in the pbw) **at install time** — if the watchapp fires but
+   (MR !542 pending — i.e., any stock release): sideload the bridge APK
+   (`FMDRing.apk`). In-place updates keep settings.
+2. Sideload the `.pbw` — **one pbw works for every setup**. Its companion list
+   declares, in preference order: FMD release → FMD dev → the bridge APK.
+   The Pebble app binds the first one that is installed *and* actually
+   exposes the PK2 service (capability-probed). On phones with stock FMD that
+   is the bridge; on FMD builds with MR !542 it is FMD itself.
+3. Companion metadata is read **at install time** — if the watchapp fires but
    the phone stays silent, fully delete the watchapp in the Pebble app and
    re-sideload.
 

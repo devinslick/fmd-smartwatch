@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.devinslick.fmdring"
-    android:versionCode="9"
-    android:versionName="0.6.1">
+    android:versionCode="10"
+    android:versionName="0.7.0">
 
     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
 
@@ -21,7 +21,7 @@
     </queries>
 
     <application
-        android:label="FMD Ring"
+        android:label="FMD Watch Bridge"
         android:allowBackup="false"
         android:theme="@android:style/Theme.Material">
 

@@ -1,20 +1,23 @@
-# fmd-pebble
+# fmd-smartwatch
 
 Trigger [Find My Device (FMD)](https://gitlab.com/fmd-foss/fmd-android) commands
-from a Pebble smartwatch — fully offline, over the watch's existing Bluetooth
-connection to the phone.
+from a smartwatch — fully offline, over the watch's existing Bluetooth
+connection to the phone. One repo per platform under one roof:
 
-Two components:
-
-- **`android/`** — "FMD Ring", a ~25 KB gradle-free Android app. Trigger-based
-  only: exported manifest receivers/services that Android spawns on demand.
-  No persistent process, no server, no sockets.
-- **`fmd-ring-watch/`** — "FMD Ring" Pebble watchapp (C, SDK 3, all classic
+- **`android/`** — "FMD Ring", the phone bridge. A ~25 KB gradle-free Android
+  app. Trigger-based only: exported manifest receivers/services that Android
+  spawns on demand. No persistent process, no server, no sockets.
+- **`pebble/`** — "FMD Remote", the Pebble watchapp (C, SDK 3, all classic
   platforms). Action list: Ring / Locate (plain, last known, GPS) / Stats /
   Lock / Flash / Ringer mode / DND / BT scan / Camera (front + back) — short
   titles with small-text subtitles so nothing truncates on 144px screens.
+- **`wear/`** — "FMD Remote" for Wear OS (Galaxy Watch 5+, planned — see
+  `wear/README.md`).
 
-## How it works
+The watch apps are the remotes; `android/` is the bridge that turns their
+messages into FMD commands.
+
+## How it works (Pebble today)
 
 ```
 watchapp SELECT
@@ -30,8 +33,12 @@ watchapp SELECT
 ```
 
 FMD holds every privileged permission (max alarm volume, DND override, device
-admin); this app is a dumb, permissionless trigger. The FMD notification
+admin); the bridge is a dumb, permissionless trigger. The FMD notification
 password lives in the app's settings (SharedPreferences), never in the binary.
+
+An upstream FMD MR (optional, cleaner path) adds a PebbleKit 2 companion
+service to FMD itself, removing the bridge from the loop:
+<https://gitlab.com/fmd-foss/fmd-android/-/merge_requests/542>
 
 ## FMD prerequisites (one-time)
 
@@ -68,12 +75,12 @@ adb shell am broadcast -a com.devinslick.fmdring.action.RING \
 
 ## CI
 
-`.github/workflows/build.yml` builds both artifacts on every push to `main`
-and uploads them as run artifacts (`FMDRing-apk`, `fmd-ring-pbw`).
+`.github/workflows/build.yml` builds the artifacts on every push to `main`
+and uploads them as run artifacts (`FMDRing-apk`, `fmd-remote-pbw`).
 
 Local builds: `android/build.sh` (needs JDK 17 + Android SDK build-tools
 34/platforms 34, paths overridable via `ANDROID_SDK`/`JAVA_HOME`) and
-`pebble build` in `fmd-ring-watch/` (needs
+`pebble build` in `pebble/` (needs
 [`pebble-tool`](https://developer.repebble.com/sdk/)).
 
 ## Security notes

@@ -1,14 +1,14 @@
 {
-  "name": "fmd-ring",
+  "name": "fmd-remote",
   "author": "Devin Slick",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "keywords": [
     "pebble-app"
   ],
   "private": true,
   "dependencies": {},
   "pebble": {
-    "displayName": "FMD Ring",
+    "displayName": "FMD Remote",
     "uuid": "39084eff-db47-473c-b1af-eb44fdbaa8b5",
     "sdkVersion": "3",
     "enableMultiJS": true,

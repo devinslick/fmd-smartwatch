@@ -55,10 +55,10 @@ jobs:
       - name: Build watchapp
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          cd fmd-ring-watch && pebble build
+          cd pebble && pebble build
 
       - uses: actions/upload-artifact@v4
         with:
-          name: fmd-ring-pbw
-          path: fmd-ring-watch/build/*.pbw
+          name: fmd-remote-pbw
+          path: pebble/build/*.pbw
           if-no-files-found: error

@@ -3,6 +3,6 @@ android/build/
 android/classes.dex
 android/FMDRing.apk
 android/FMDRing.apk.idsig
-fmd-ring-watch/build/
-fmd-ring-watch/.lock-waf*
+pebble/build/
+pebble/.lock-waf*
 **/node_modules/

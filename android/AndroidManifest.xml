@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.devinslick.fmdring"
-    android:versionCode="8"
-    android:versionName="0.6.0">
+    android:versionCode="9"
+    android:versionName="0.6.1">
 
     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Package visibility (API 30+): see PK2-capable apps for the
+         capability-based caller check and sender-service discovery -->
+    <queries>
+        <intent>
+            <action android:name="io.rebble.pebblekit2.SEND_DATA_TO_WATCH" />
+        </intent>
+        <intent>
+            <action android:name="io.rebble.pebblekit2.RECEIVE_DATA_FROM_WATCH" />
+        </intent>
+    </queries>
 
     <application
         android:label="FMD Ring"

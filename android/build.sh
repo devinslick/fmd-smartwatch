@@ -22,7 +22,7 @@ $BT/aapt2 link \
     --manifest AndroidManifest.xml \
     --java build/gen \
     --min-sdk-version 26 --target-sdk-version 34 \
-    --version-code 8 --version-name 0.6.0 \
+    --version-code 9 --version-name 0.6.1 \
     build/res.zip
 
 # 2b. Compile AIDL (PebbleKit 2 companion binder)

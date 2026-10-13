@@ -37,21 +37,22 @@ public class FmdPebbleService extends Service {
     private static final String ACTION_RECEIVE_DATA = "ACTION_RECEIVE_DATA_FROM_WATCH";
     private static final String KEY_RESULTS = "TRANSMISSION_RESULTS";
     private static final String KEY_TYPE = "TYPE";
+    private static final String ACTION_SEND = "io.rebble.pebblekit2.SEND_DATA_TO_WATCH";
 
     private final UniversalRequestResponse.Stub binder = new UniversalRequestResponse.Stub() {
         @Override
         public void request(Bundle data, SendDataCallback callback) {
-            String caller = callerName();
             String action = data == null ? null : data.getString(KEY_ACTION);
             String uuid = data == null ? null : data.getString(KEY_WATCHAPP_UUID);
             String suffix = parseCommandSuffix(data == null ? null : data.getBundle(KEY_DATA_DICTIONARY));
+            boolean callerOk = callerIsPebbleApp();
             Log.d(TAG, "PK2 request: action=" + action + " uuid=" + uuid
-                    + " cmd=" + suffix + " caller=" + caller);
+                    + " cmd=" + suffix + " callerOk=" + callerOk);
 
-            boolean ok = ACTION_RECEIVE_DATA.equals(action) && caller != null && suffix != null;
+            boolean ok = ACTION_RECEIVE_DATA.equals(action) && callerOk && suffix != null;
 
             if (ok && Prefs.getDebug(FmdPebbleService.this)) {
-                postDebug("req: " + action + "\ncmd=" + suffix + "\nuuid=" + uuid + "\ncaller=" + caller);
+                postDebug("req: " + action + "\ncmd=" + suffix + "\nuuid=" + uuid + "\ncallerOk=" + callerOk);
             }
 
             if (ok) {
@@ -115,23 +116,28 @@ public class FmdPebbleService extends Service {
         return s.isEmpty() ? null : s;
     }
 
-    private String callerName() {
+    /**
+     * Identity by capability, not by name: a Pebble mobile app is an app that
+     * exposes the PK2 sender service. Name lists break - the RePebble app's
+     * package is coredevices.coreapp (no "pebble"/"rebble" at all).
+     */
+    private boolean callerIsPebbleApp() {
         try {
             String[] pkgs = getPackageManager().getPackagesForUid(Binder.getCallingUid());
-            if (pkgs == null || pkgs.length == 0) {
-                return null;
+            if (pkgs == null) {
+                return false;
             }
-            StringBuilder sb = new StringBuilder();
             for (String p : pkgs) {
-                if (sb.length() > 0) {
-                    sb.append(',');
+                Intent probe = new Intent(ACTION_SEND)
+                        .setPackage(p);
+                if (!getPackageManager().queryIntentServices(probe, 0).isEmpty()) {
+                    return true;
                 }
-                sb.append(p);
             }
-            return sb.toString();
         } catch (Exception e) {
-            return null;
+            Log.w(TAG, "caller check failed", e);
         }
+        return false;
     }
 
     private void postDebug(String text) {

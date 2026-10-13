@@ -131,20 +131,13 @@ public final class WatchPusher {
     }
 
     private static String findPebbleApp(Context ctx) {
+        // Any app exposing the PK2 sender service is a Pebble mobile app.
+        // (Do NOT filter by package name - coredevices.coreapp would be missed.)
         List<ResolveInfo> svcs = ctx.getPackageManager()
                 .queryIntentServices(new Intent(ACTION_SEND), 0);
-        if (svcs == null) {
+        if (svcs == null || svcs.isEmpty()) {
             return null;
         }
-        for (ResolveInfo ri : svcs) {
-            if (ri.serviceInfo == null) {
-                continue;
-            }
-            String p = ri.serviceInfo.packageName.toLowerCase();
-            if (p.contains("pebble") || p.contains("rebble")) {
-                return ri.serviceInfo.packageName;
-            }
-        }
-        return null;
+        return svcs.get(0).serviceInfo != null ? svcs.get(0).serviceInfo.packageName : null;
     }
 }

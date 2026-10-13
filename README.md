@@ -40,6 +40,7 @@ bridge today, and links native-support MRs here as they open.
 | Garmin (Connect IQ) | — | idea | none |
 | Bangle.js | — | idea | none |
 | Amazfit (Zepp OS) | — | idea | none |
+| watchOS (Apple Watch) | — | idea | no Android↔watchOS link exists; the only conceivable path is the watch reaching the FMD server directly over its own LTE/Wi-Fi — never via the phone's Bluetooth |
 
 Until a platform's native support ships in an FMD release, that platform
 needs the bridge APK.
@@ -55,7 +56,7 @@ flowchart TD
     W -->|"AppMessage (Cmd string)"| P
     P -->|"FMD with PK2 companion service (MR !542)"| FMD
     P -->|"Bridge APK (stock FMD)"| B["Bridge: FmdPebbleService"]
-    B -->|"posts notification:<br/>fmd &lt;pin&gt; &lt;command&gt;"| L["FMD notification listener"]
+    B -->|"posts the FMD command notification<br/>(trigger word + pin + command)"| L["FMD notification listener"]
     L --> FMD
 
     FMD -->|"result, native path:<br/>PebbleKit2Sender → watch"| W

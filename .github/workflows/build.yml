@@ -62,3 +62,30 @@ jobs:
           name: fmd-remote-pbw
           path: pebble/build/*.pbw
           if-no-files-found: error
+
+  wear:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install SDK packages
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            --install "platforms;android-34" "build-tools;34.0.0" >/dev/null
+
+      - name: Build wear modules
+        run: cd wear && ./gradlew assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fmd-remote-wear
+          path: |
+            wear/app/build/outputs/apk/debug/*.apk
+            wear/bridge/build/outputs/apk/debug/*.apk
+          if-no-files-found: error

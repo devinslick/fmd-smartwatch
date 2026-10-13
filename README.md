@@ -36,7 +36,7 @@ bridge today, and links native-support MRs here as they open.
 | Platform | Remote | State | Native FMD support |
 |---|---|---|---|
 | Pebble (classic) | `pebble/` v1.5.1 | ✅ tested & working | [fmd-android MR !542](https://gitlab.com/fmd-foss/fmd-android/-/merge_requests/542) — draft open, pending review |
-| Wear OS (GW5+) | `wear/` | 🚧 planned | none yet — would need a Wear/Play-Services dependency in FMD; maintainer decision |
+| Wear OS (GW5+) | `wear/` | 🚧 drafted, untested on-device | none yet — would need a Wear/Play-Services dependency in FMD; maintainer decision |
 | Garmin (Connect IQ) | — | idea | none |
 | Bangle.js | — | idea | none |
 | Amazfit (Zepp OS) | — | idea | none |

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Capability the watch app queries to discover this bridge -->
+    <string-array name="android_wear_capabilities">
+        <item>fmd_bridge</item>
+    </string-array>
+</resources>

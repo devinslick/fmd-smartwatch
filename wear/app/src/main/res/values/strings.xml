@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FMD Remote</string>
+    <string name="status_starting">Starting…</string>
+    <string name="status_searching">Searching for bridge…</string>
+    <string name="status_connected">Bridge: %1$s</string>
+    <string name="status_no_bridge">No bridge found.\nInstall &amp; open FMD Watch Bridge on the phone.</string>
+    <string name="status_sending">Sending: %1$s</string>
+    <string name="status_sent">Sent: %1$s</string>
+    <string name="status_error">Error: %1$s</string>
+</resources>

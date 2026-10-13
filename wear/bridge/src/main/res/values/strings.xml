@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FMD Wear Bridge</string>
+    <string name="trigger_hint">FMD trigger word (default: fmd)</string>
+    <string name="pin_hint">FMD notification password</string>
+    <string name="save">Save</string>
+    <string name="saved">Saved. Commands from the watch will now fire.</string>
+    <string name="grant_notifs">Grant notification permission so FMD can see command notifications.</string>
+</resources>

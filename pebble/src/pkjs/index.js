@@ -1,13 +1,13 @@
-// FMD Ring - PebbleKit JS companion (optional HTTP path).
+// FMD Remote - PebbleKit JS companion (optional HTTP path).
 // Primary path is the Android-side companion receiver (AppMessage broadcast);
-// this JS is a best-effort secondary: loopback HTTP to the FMD Ring app if
+// this JS is a best-effort secondary: loopback HTTP to the bridge app if
 // it happens to be reachable. Errors are intentionally NOT reported to the
 // watch so the companion path's behavior stays visible on screen.
 
 var RING_URL = 'http://127.0.0.1:47613/ring';
 
 Pebble.addEventListener('ready', function () {
-  console.log('FMD Ring pkjs ready');
+  console.log('FMD Remote pkjs ready');
 });
 
 Pebble.addEventListener('appmessage', function (e) {

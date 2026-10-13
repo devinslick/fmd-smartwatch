@@ -4,7 +4,7 @@ Trigger [Find My Device (FMD)](https://gitlab.com/fmd-foss/fmd-android) commands
 from a smartwatch — fully offline, over the watch's existing Bluetooth
 connection to the phone. One repo per platform under one roof:
 
-- **`android/`** — "FMD Ring", the phone bridge. A ~25 KB gradle-free Android
+- **`android/`** — the bridge APK ("FMD Ring"). A ~25 KB gradle-free Android
   app. Trigger-based only: exported manifest receivers/services that Android
   spawns on demand. No persistent process, no server, no sockets.
 - **`pebble/`** — "FMD Remote", the Pebble watchapp (C, SDK 3, all classic
@@ -16,6 +16,32 @@ connection to the phone. One repo per platform under one roof:
 
 The watch apps are the remotes; `android/` is the bridge that turns their
 messages into FMD commands.
+
+## Why a bridge APK? (it is not the goal)
+
+The goal is watch control **native to FMD**: FMD itself receiving watch
+commands, with no third-party phone app in the loop. The bridge APK is
+scaffolding toward that:
+
+- **For Pebble, it is a stopgap.** Stock FMD releases cannot receive anything
+  from a watch. The bridge fills that gap by turning watch messages into the
+  notification FMD already trusts (`fmd <pin> <command>`). Once the FMD MR
+  below merges and ships in a release, Pebble remotes talk to FMD directly
+  (the pbw's companion package points at FMD) and the bridge is no longer
+  needed for Pebble.
+- **For Wear OS, it is permanent.** FMD's maintainers will not take Google
+  Play Services dependencies — so the Wear Data Layer listener can never live
+  in FMD. The bridge APK is the forever-home of the Wear phone side.
+
+## Platform status
+
+| Platform | Remote | State | Upstream dependency |
+|---|---|---|---|
+| Pebble (classic) | `pebble/` v1.5.0 | ✅ tested & working | [fmd-android MR !542](https://gitlab.com/fmd-foss/fmd-android/-/merge_requests/542) (optional PebbleKit 2 companion service) — **pending review**; until it ships, use the bridge APK |
+| Wear OS (GW5+) | `wear/` | 🚧 planned | none possible — bridge APK is permanent for Wear (FMD will not take play-services) |
+
+MR !542 status: draft opened, builds and lint green locally; validated
+end-to-end on-device (watch → Pebble app → FMD dev build, no bridge).
 
 ## How it works (Pebble today)
 
@@ -50,7 +76,9 @@ service to FMD itself, removing the bridge from the loop:
 
 ## Install order (always)
 
-1. Sideload `FMDRing.apk` (in-place updates keep settings).
+1. If your FMD build does not yet include the PebbleKit 2 companion service
+   (MR !542 pending — i.e., any stock release): sideload `FMDRing.apk` (the
+   bridge). In-place updates keep settings.
 2. Sideload the `.pbw`. The Pebble app reads the companion package
    (`companionApp` in the pbw) **at install time** — if the watchapp fires but
    the phone stays silent, fully delete the watchapp in the Pebble app and

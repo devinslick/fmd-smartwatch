@@ -19,52 +19,55 @@ messages into FMD commands.
 
 ## Why a bridge APK? (it is not the goal)
 
-The goal is watch control **native to FMD**: FMD itself receiving watch
-commands, with no third-party phone app in the loop. The bridge APK is
-scaffolding toward that:
+The goal is **native FMD support** on every watch platform: FMD itself
+receiving watch commands, with no third-party phone app in the loop. Until
+FMD natively supports a given platform, the bridge APK fills the gap by
+turning that platform's watch messages into the notification FMD already
+trusts (`fmd <pin> <command>`). When a platform's native support lands and
+ships in a release (Pebble: MR !542), that platform's remote talks to FMD
+directly and the bridge is no longer needed for it.
 
-- **For Pebble, it is a stopgap.** Stock FMD releases cannot receive anything
-  from a watch. The bridge fills that gap by turning watch messages into the
-  notification FMD already trusts (`fmd <pin> <command>`). Once the FMD MR
-  below merges and ships in a release, Pebble remotes talk to FMD directly
-  (the pbw's companion package points at FMD) and the bridge is no longer
-  needed for Pebble.
-- **For Wear OS, it is permanent.** FMD's maintainers will not take Google
-  Play Services dependencies — so the Wear Data Layer listener can never live
-  in FMD. The bridge APK is the forever-home of the Wear phone side.
+Whether and how a platform gets native support is the FMD maintainers' call —
+this repo does not presume the answer. It ships working remotes plus the
+bridge today, and links native-support MRs here as they open.
 
 ## Platform status
 
-| Platform | Remote | State | Upstream dependency |
+| Platform | Remote | State | Native FMD support |
 |---|---|---|---|
-| Pebble (classic) | `pebble/` v1.5.0 | ✅ tested & working | [fmd-android MR !542](https://gitlab.com/fmd-foss/fmd-android/-/merge_requests/542) (optional PebbleKit 2 companion service) — **pending review**; until it ships, use the bridge APK |
-| Wear OS (GW5+) | `wear/` | 🚧 planned | none possible — bridge APK is permanent for Wear (FMD will not take play-services) |
+| Pebble (classic) | `pebble/` v1.5.1 | ✅ tested & working | [fmd-android MR !542](https://gitlab.com/fmd-foss/fmd-android/-/merge_requests/542) — draft open, pending review |
+| Wear OS (GW5+) | `wear/` | 🚧 planned | none yet — would need a Wear/Play-Services dependency in FMD; maintainer decision |
+| Garmin (Connect IQ) | — | idea | none |
+| Bangle.js | — | idea | none |
+| Amazfit (Zepp OS) | — | idea | none |
 
-MR !542 status: draft opened, builds and lint green locally; validated
-end-to-end on-device (watch → Pebble app → FMD dev build, no bridge).
+Until a platform's native support ships in an FMD release, that platform
+needs the bridge APK.
 
 ## How it works (Pebble today)
 
-```
-watchapp SELECT
-  └─ AppMessage (Cmd string, key 10000)
-       └─ Pebble app binds the PK2 companion service (on demand)
-            └─ FmdPebbleService (io.rebble.pebblekit2.RECEIVE_DATA_FROM_WATCH)
-                 └─ posts notification: "fmd <pin> <command>"
-                      └─ FMD's NotificationListenService executes it
-                           └─ replies through the notification's RemoteInput
-                                └─ ReplyReceiver
-                                     ├─ phone notification (geo: map pin for locate)
-                                     └─ WatchPusher → SEND_DATA_TO_WATCH → watch display
+```mermaid
+flowchart TD
+    W["Watch — FMD Remote<br/>UP/DOWN picks action · SELECT fires"]
+    P["Pebble app — binds the first installed companion<br/>that exposes the PK2 service"]
+    FMD["FMD — parses & executes the command<br/>(ring · locate · lock · camera · …)"]
+
+    W -->|"AppMessage (Cmd string)"| P
+    P -->|"FMD with PK2 companion service (MR !542)"| FMD
+    P -->|"Bridge APK (stock FMD)"| B["Bridge: FmdPebbleService"]
+    B -->|"posts notification:<br/>fmd &lt;pin&gt; &lt;command&gt;"| L["FMD notification listener"]
+    L --> FMD
+
+    FMD -->|"result, native path:<br/>PebbleKit2Sender → watch"| W
+    FMD -.->|"result reply, bridge path"| RR["ReplyReceiver"]
+    RR --> PN["phone notification (geo: map pin)"]
+    RR --> WP["WatchPusher → SEND_DATA_TO_WATCH → watch"]
 ```
 
 FMD holds every privileged permission (max alarm volume, DND override, device
 admin); the bridge is a dumb, permissionless trigger. The FMD notification
-password lives in the app's settings (SharedPreferences), never in the binary.
-
-An upstream FMD MR (optional, cleaner path) adds a PebbleKit 2 companion
-service to FMD itself, removing the bridge from the loop:
-<https://gitlab.com/fmd-foss/fmd-android/-/merge_requests/542>
+password lives in the bridge's settings (SharedPreferences), never in the
+binary.
 
 ## FMD prerequisites (one-time)
 

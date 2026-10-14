@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.devinslick.fmdring"
-    android:versionCode="10"
-    android:versionName="0.7.0">
-
-    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="34" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -42,6 +37,7 @@
 
         <!-- FMD command results arrive via the command notification's reply action -->
         <receiver android:name=".ReplyReceiver" android:exported="false" />
+        <receiver android:name=".WearReplyReceiver" android:exported="false" />
 
         <!-- New RePebble Pebble app: PebbleKit 2 companion delivery -->
         <service
@@ -49,6 +45,16 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="io.rebble.pebblekit2.RECEIVE_DATA_FROM_WATCH" />
+            </intent-filter>
+        </service>
+
+        <!-- Wear OS: Data Layer command listener; advertises the
+             fmd_bridge capability (res/values/wear.xml) -->
+        <service
+            android:name=".FmdWearListenerService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
         </service>
 

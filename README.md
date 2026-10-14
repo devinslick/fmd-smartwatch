@@ -5,9 +5,13 @@ from a smartwatch — over the watch's existing link to the phone where one
 exists (Pebble, Wear OS), or straight to your FMD Server where it doesn't
 (watchOS). One repo per platform under one roof:
 
-- **`android/`** — the bridge APK ("FMD Watch Bridge"). A ~25 KB gradle-free
-  Android app. Trigger-based only: exported manifest receivers/services that
-  Android spawns on demand. No persistent process, no server, no sockets.
+- **`android/`** — the bridge APK ("FMD Watch Bridge", `com.devinslick.fmdring`
+  v0.8.0). Gradle-based since v0.8.0 (was gradle-free through v0.7.0) so it can
+  absorb per-platform listeners: Pebble (PK2 companion service) + Wear OS
+  (Data Layer listener) today, Garmin/Bangle/Zepp coming. Still
+  trigger-based only — no persistent process beyond SDK-imposed listeners,
+  no server, no sockets. One bridge APK for every platform until FMD
+  natively supports each.
 - **`pebble/`** — "FMD Remote", the Pebble watchapp (C, SDK 3, all classic
   platforms). Action list: Ring / Locate (plain, last known, GPS) / Stats /
   Lock / Flash / Ringer mode / DND / BT scan / Camera (front + back) — short
@@ -86,8 +90,9 @@ binary.
 ## Install order (always)
 
 1. If your FMD build does not yet include the PebbleKit 2 companion service
-   (MR !542 pending — i.e., any stock release): sideload the bridge APK
-   (`FMDRing.apk`). In-place updates keep settings.
+   (MR !542 pending — i.e., any stock release): install the bridge APK
+   (CI artifact `FMDRing-apk`). In-place updates keep settings. The same
+   APK also carries the Wear OS listener.
 2. Sideload the `.pbw` — **one pbw works for every setup**. Its companion list
    declares, in preference order: FMD release → FMD dev → the bridge APK.
    The Pebble app binds the first one that is installed *and* actually
@@ -121,8 +126,8 @@ and uploads them as run artifacts (`FMDRing-apk`, `fmd-remote-pbw`,
 `fmd-remote-wear`).
 
 Local builds:
-- `android/`: `build.sh` (JDK 17 + Android SDK build-tools 34/platforms 34;
-  overridable via `ANDROID_SDK`/`JAVA_HOME`)
+- `android/`: `./gradlew assembleDebug` (JDK 21 + Android SDK platform 34;
+  `local.properties` with `sdk.dir`; same debug keystore → in-place updates)
 - `pebble/`: `pebble build` (needs
   [`pebble-tool`](https://developer.repebble.com/sdk/))
 - `wear/`: `./gradlew assembleDebug` (JDK 21 + Android SDK platform 34;

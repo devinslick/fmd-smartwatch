@@ -1,4 +1,4 @@
-package com.devinslick.fmdwearbridge;
+package com.devinslick.fmdring;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -18,13 +18,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Receives FMD's command RESULTS: FMD's NotificationReplyTransport replies
- * through the command notification's RemoteInput action (result key "reply").
- * Shows a phone notification (geo: link for locates) and forwards the text
- * to the requesting watch node on /fmd-result.
- *
- * Ported from the fmdring bridge ReplyReceiver; the Pebble WatchPusher is
- * replaced by the Wear Data Layer message send.
+ * Receives FMD command RESULTS for the Wear path: FMD's reply through the
+ * command notification's RemoteInput action (result key "reply"). Shows a
+ * phone notification (geo: link for locates) and forwards the text to the
+ * requesting watch node on /fmd-result.
  */
 public class WearReplyReceiver extends BroadcastReceiver {
 

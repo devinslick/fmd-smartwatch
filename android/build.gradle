@@ -1,0 +1,63 @@
+plugins {
+    id 'com.android.application' version '9.2.1'
+}
+
+android {
+    namespace 'com.devinslick.fmdring'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.devinslick.fmdring"
+        minSdk 26
+        targetSdk 34
+        versionCode 11
+        versionName "0.8.0"
+    }
+
+    // Legacy tree from the gradle-free era — kept stable so the git history
+    // reads as moves, not rewrites.
+    sourceSets {
+        main {
+            java.srcDirs = ['src']
+            aidl.srcDirs = ['src/aidl']
+            manifest.srcFile 'AndroidManifest.xml'
+            res.srcDirs = ['res']
+        }
+    }
+
+    // Same keystore as always (was android/debug.keystore in the gradle-free
+    // build): CI builds update installed builds in place.
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    buildFeatures {
+        aidl true
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    // Wear OS listener (Data Layer). FMD upstream stays Google-free —
+    // the bridge is ours and carries platform SDKs.
+    implementation 'com.google.android.gms:play-services-wearable:18.2.0'
+}

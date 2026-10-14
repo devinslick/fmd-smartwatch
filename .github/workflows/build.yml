@@ -23,12 +23,12 @@ jobs:
             --install "platforms;android-34" "build-tools;34.0.0" >/dev/null
 
       - name: Build APK
-        run: ANDROID_SDK="$ANDROID_HOME" ./android/build.sh
+        run: cd android && ./gradlew assembleDebug --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
           name: FMDRing-apk
-          path: android/FMDRing.apk
+          path: android/build/outputs/apk/debug/*.apk
           if-no-files-found: error
 
   watchapp:
@@ -80,12 +80,10 @@ jobs:
             --install "platforms;android-34" "build-tools;34.0.0" >/dev/null
 
       - name: Build wear modules
-        run: cd wear && ./gradlew assembleDebug --no-daemon
+        run: cd wear && ./gradlew :app:assembleDebug --no-daemon
 
       - uses: actions/upload-artifact@v4
         with:
           name: fmd-remote-wear
-          path: |
-            wear/app/build/outputs/apk/debug/*.apk
-            wear/bridge/build/outputs/apk/debug/*.apk
+          path: wear/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error

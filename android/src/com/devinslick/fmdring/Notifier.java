@@ -107,4 +107,37 @@ public final class Notifier {
                 .build();
         ctx.getSystemService(NotificationManager.class).notify(ID_COMMAND, n);
     }
+
+    /**
+     * Wear variant: carries the requesting watch node so FMD's result can be
+     * routed back over the Data Layer (WearReplyReceiver). Distinct request
+     * code so the PendingIntent extras never collide with the Pebble one.
+     */
+    public static void postCommandNotification(Context ctx, String command, String replyNode) {
+        ensureChannels(ctx);
+
+        android.app.RemoteInput ri = new android.app.RemoteInput.Builder("reply")
+                .setLabel("Result")
+                .build();
+        Intent replyIntent = new Intent(ctx, WearReplyReceiver.class);
+        if (replyNode != null) {
+            replyIntent.putExtra(WearReplyReceiver.EXTRA_NODE, replyNode);
+        }
+        PendingIntent replyPi = PendingIntent.getBroadcast(
+                ctx, 3, replyIntent,
+                PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        Notification.Action action = new Notification.Action.Builder(
+                R.drawable.ic_notif, "Result", replyPi)
+                .addRemoteInput(ri)
+                .build();
+
+        Notification n = new Notification.Builder(ctx, CH_COMMAND)
+                .setSmallIcon(R.drawable.ic_notif)
+                .setContentTitle("FMD")
+                .setContentText(command)
+                .setTimeoutAfter(4000)
+                .addAction(action)
+                .build();
+        ctx.getSystemService(NotificationManager.class).notify(ID_COMMAND, n);
+    }
 }

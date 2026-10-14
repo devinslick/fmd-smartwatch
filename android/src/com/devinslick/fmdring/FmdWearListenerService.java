@@ -1,4 +1,4 @@
-package com.devinslick.fmdwearbridge;
+package com.devinslick.fmdring;
 
 import android.content.Intent;
 
@@ -8,10 +8,14 @@ import com.google.android.gms.wearable.WearableListenerService;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Wear Data Layer entry point: receives raw command suffixes from the
- * FMD Remote watch app on /fmd-cmd, composes trigger + pin + command and
- * posts the notification FMD trusts. Results come back through
- * WearReplyReceiver and are forwarded to the watch on /fmd-result.
+ * Wear OS entry point: receives raw command suffixes from the FMD Remote
+ * watch app on /fmd-cmd over the Wear Data Layer (the watch's existing
+ * Wear/BT stack), composes trigger + pin + command, and posts the
+ * notification FMD trusts. Results come back through WearReplyReceiver
+ * and are forwarded to the watch on /fmd-result.
+ *
+ * Ported from the wear/ draft bridge when the bridges were consolidated
+ * into this APK (v0.8.0).
  */
 public class FmdWearListenerService extends WearableListenerService {
 

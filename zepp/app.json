@@ -1,0 +1,14 @@
+{
+  "appId": "FILL_IN_FROM_DEV_ZEPP_COM",
+  "appName": "FMD Remote",
+  "appType": "app",
+  "icon": "assets/icon.png",
+  "vibration": true,
+  "version": "0.1.0",
+  "minApiLevel": 3,
+  "targets": {},
+  "config": {},
+  "i18n": {
+    "en-US": { "name": "FMD Remote" }
+  }
+}

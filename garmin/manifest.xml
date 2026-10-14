@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- NOTE: This is a beta manifest and is subject to change -->
+<iq:manifest version="3" xmlns:iq="http://www.garmin.com/xml/connectiq">
+    <iq:application id="adfb536867db463f91e54d45341f5c09" entry="FmdRemoteApp" type="watch-app" name="@Strings.AppName" minApiLevel="2.4.0">
+        <iq:products>
+            <iq:product id="vivoactive4"/>
+            <iq:product id="venu2"/>
+            <iq:product id="fenix7"/>
+            <iq:product id="epix2"/>
+            <iq:product id="forerunner265"/>
+            <iq:product id="forerunner965"/>
+            <iq:product id="vivoactive5"/>
+            <iq:product id="venu3"/>
+            <iq:product id="fenix8"/>
+        </iq:products>
+        <iq:permissions>
+            <iq:uses-permission id="Communications"/>
+        </iq:permissions>
+        <iq:languages>
+            <iq:language id="eng"/>
+        </iq:languages>
+        <iq:resources>
+            <iq:drawable id="AppIcon" filename="icon.png"/>
+            <iq:string id="AppName">FMD Remote</iq:string>
+            <iq:string id="PromptTitle">FMD Remote</iq:string>
+        </iq:resources>
+    </iq:application>
+</iq:manifest>

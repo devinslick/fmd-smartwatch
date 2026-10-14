@@ -87,3 +87,22 @@ jobs:
           name: fmd-remote-wear
           path: wear/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+  bangle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate
+        run: |
+          node --check bangle/app.js
+          python3 -m json.tool bangle/app.json > /dev/null
+
+  zepp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate
+        run: |
+          python3 -m py_compile zepp/relay/relay.py
+          cp zepp/app.js /tmp/a.mjs && node --check /tmp/a.mjs
+          cp zepp/app-side/index.js /tmp/b.mjs && node --check /tmp/b.mjs

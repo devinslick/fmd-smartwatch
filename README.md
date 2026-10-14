@@ -22,6 +22,12 @@ exists (Pebble, Wear OS), or straight to your FMD Server where it doesn't
   that talks to an FMD Server directly (no bridge exists or is needed —
   `watchos/DESIGN.md`). Ships the cross-platform Swift protocol core
   (`fmd-server-core/`) today.
+- **`garmin/`**, **`bangle/`**, **`zepp/`** — drafts for Connect IQ,
+  Bangle.js, and Amazfit/Zepp OS: watch-app sources + bridge listeners
+  (Garmin SDK listener and Bangle Gadgetbridge receiver ship in the bridge
+  APK v0.9.0+; Zepp is cloud-mediated — the platform allows nothing local).
+  Each has a README with its data flow and how-to-help; all need
+  contributor hardware testing.
 
 The watch apps are the remotes; `android/` is the bridge that turns their
 messages into FMD commands.
@@ -46,9 +52,9 @@ bridge today, and links native-support MRs here as they open.
 |---|---|---|---|
 | Pebble (classic) | `pebble/` v1.5.1 | ✅ tested & working | [fmd-android MR !542](https://gitlab.com/fmd-foss/fmd-android/-/merge_requests/542) — under active review |
 | Wear OS (GW5+) | `wear/` v0.1.0 | 🚧 drafted, untested on-device | none yet — would need a Wear/Play-Services dependency in FMD; maintainer decision |
-| Garmin (Connect IQ) | — | idea | none |
-| Bangle.js | — | idea | none |
-| Amazfit (Zepp OS) | — | idea | none |
+| Garmin (Connect IQ) | `garmin/` | 🚧 drafted — source + bridge listener; .prg compile blocked on login-gated device files (see `garmin/README.md`) | none |
+| Bangle.js | `bangle/` | 🚧 drafted — app + Gadgetbridge-intent receiver; needs on-watch test | none |
+| Amazfit (Zepp OS) | `zepp/` | 🚧 drafted — **cloud-mediated only** (no local path exists); relay + watch app; last hop needs design | none |
 | watchOS (Apple Watch) | `watchos/` | 🚧 Swift protocol core implemented + tested (12/12); watch app not started (needs Xcode + hardware) | n/a — no phone link exists; the watch talks to the FMD server directly over its own LTE/Wi-Fi ([fmd-ios](watchos/DESIGN.md) would be the proper future entry, separate effort) |
 
 Until a platform's native support ships in an FMD release, that platform

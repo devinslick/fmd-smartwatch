@@ -28,6 +28,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Notifier.ensureChannels(this);
+        GarminSupport.init(this);
 
         ScrollView scroll = new ScrollView(this);
         LinearLayout root = new LinearLayout(this);

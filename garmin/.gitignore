@@ -1,0 +1,4 @@
+sdk/
+build/
+developer_key*
+*.prg

@@ -1,0 +1,15 @@
+{
+  "id": "fmdremote",
+  "name": "FMD Remote",
+  "shortName": "FMD",
+  "version": "0.1.0",
+  "description": "Send Find My Device (FMD) commands to your Android phone via Gadgetbridge intents. Requires the FMD Watch Bridge app + Gadgetbridge 'Allow intents'.",
+  "icon": "app.png",
+  "type": "app",
+  "tags": "tool,android,findmydevice",
+  "supports": ["BANGLEJS", "BANGLEJS2"],
+  "readme": "README.md",
+  "storage": [
+    { "name": "fmdremote.app.js", "url": "app.js", "supportFiles": false }
+  ]
+}

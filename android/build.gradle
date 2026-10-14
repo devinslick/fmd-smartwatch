@@ -10,8 +10,8 @@ android {
         applicationId "com.devinslick.fmdring"
         minSdk 26
         targetSdk 34
-        versionCode 11
-        versionName "0.8.0"
+        versionCode 12
+        versionName "0.9.0"
     }
 
     // Legacy tree from the gradle-free era — kept stable so the git history
@@ -60,4 +60,7 @@ dependencies {
     // Wear OS listener (Data Layer). FMD upstream stays Google-free —
     // the bridge is ours and carries platform SDKs.
     implementation 'com.google.android.gms:play-services-wearable:18.2.0'
+
+    // Garmin Connect IQ Mobile SDK (local AAR — no public Maven coordinate)
+    implementation files('libs/connectiq-mobile-sdk.aar')
 }

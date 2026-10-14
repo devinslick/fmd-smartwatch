@@ -1,0 +1,10 @@
+base.name = FMD Remote
+app.name = FMD Remote
+app.type = watch-app
+app.uuid = adfb5368-67db-463f-91e5-4d45341f5c09
+app.icon = resources/icon.png
+languages = eng
+owner.website = https://github.com/devinslick/fmd-smartwatch
+countries = US
+exclude.api.filter = exclude-fenix8.apf
+project.name = FMD Remote

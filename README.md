@@ -1,8 +1,9 @@
 # fmd-smartwatch
 
 Trigger [Find My Device (FMD)](https://gitlab.com/fmd-foss/fmd-android) commands
-from a smartwatch — fully offline, over the watch's existing Bluetooth
-connection to the phone. One repo per platform under one roof:
+from a smartwatch — over the watch's existing link to the phone where one
+exists (Pebble, Wear OS), or straight to your FMD Server where it doesn't
+(watchOS). One repo per platform under one roof:
 
 - **`android/`** — the bridge APK ("FMD Watch Bridge"). A ~25 KB gradle-free
   Android app. Trigger-based only: exported manifest receivers/services that
@@ -11,8 +12,12 @@ connection to the phone. One repo per platform under one roof:
   platforms). Action list: Ring / Locate (plain, last known, GPS) / Stats /
   Lock / Flash / Ringer mode / DND / BT scan / Camera (front + back) — short
   titles with small-text subtitles so nothing truncates on 144px screens.
-- **`wear/`** — "FMD Remote" for Wear OS (Galaxy Watch 5+, planned — see
-  `wear/README.md`).
+- **`wear/`** — "FMD Remote" for Wear OS (Galaxy Watch 5+): Kotlin watch app
+  + Data Layer listener in a companion phone APK (`wear/README.md`).
+- **`watchos/`** — "FMD Remote" for Apple Watch: standalone watch-only app
+  that talks to an FMD Server directly (no bridge exists or is needed —
+  `watchos/DESIGN.md`). Ships the cross-platform Swift protocol core
+  (`fmd-server-core/`) today.
 
 The watch apps are the remotes; `android/` is the bridge that turns their
 messages into FMD commands.
@@ -35,12 +40,12 @@ bridge today, and links native-support MRs here as they open.
 
 | Platform | Remote | State | Native FMD support |
 |---|---|---|---|
-| Pebble (classic) | `pebble/` v1.5.1 | ✅ tested & working | [fmd-android MR !542](https://gitlab.com/fmd-foss/fmd-android/-/merge_requests/542) — draft open, pending review |
-| Wear OS (GW5+) | `wear/` | 🚧 drafted, untested on-device | none yet — would need a Wear/Play-Services dependency in FMD; maintainer decision |
+| Pebble (classic) | `pebble/` v1.5.1 | ✅ tested & working | [fmd-android MR !542](https://gitlab.com/fmd-foss/fmd-android/-/merge_requests/542) — under active review |
+| Wear OS (GW5+) | `wear/` v0.1.0 | 🚧 drafted, untested on-device | none yet — would need a Wear/Play-Services dependency in FMD; maintainer decision |
 | Garmin (Connect IQ) | — | idea | none |
 | Bangle.js | — | idea | none |
 | Amazfit (Zepp OS) | — | idea | none |
-| watchOS (Apple Watch) | `watchos/` | 📐 design decided — see [DESIGN.md](watchos/DESIGN.md) | n/a — no phone link exists; the watch talks to the FMD server directly over its own LTE/Wi-Fi ([fmd-ios](watchos/DESIGN.md) would be the proper future entry, separate effort) |
+| watchOS (Apple Watch) | `watchos/` | 🚧 Swift protocol core implemented + tested (12/12); watch app not started (needs Xcode + hardware) | n/a — no phone link exists; the watch talks to the FMD server directly over its own LTE/Wi-Fi ([fmd-ios](watchos/DESIGN.md) would be the proper future entry, separate effort) |
 
 Until a platform's native support ships in an FMD release, that platform
 needs the bridge APK.
@@ -112,12 +117,18 @@ adb shell am broadcast -a com.devinslick.fmdring.action.RING \
 ## CI
 
 `.github/workflows/build.yml` builds the artifacts on every push to `main`
-and uploads them as run artifacts (`FMDRing-apk`, `fmd-remote-pbw`).
+and uploads them as run artifacts (`FMDRing-apk`, `fmd-remote-pbw`,
+`fmd-remote-wear`).
 
-Local builds: `android/build.sh` (needs JDK 17 + Android SDK build-tools
-34/platforms 34, paths overridable via `ANDROID_SDK`/`JAVA_HOME`) and
-`pebble build` in `pebble/` (needs
-[`pebble-tool`](https://developer.repebble.com/sdk/)).
+Local builds:
+- `android/`: `build.sh` (JDK 17 + Android SDK build-tools 34/platforms 34;
+  overridable via `ANDROID_SDK`/`JAVA_HOME`)
+- `pebble/`: `pebble build` (needs
+  [`pebble-tool`](https://developer.repebble.com/sdk/))
+- `wear/`: `./gradlew assembleDebug` (JDK 21 + Android SDK platform 34;
+  `local.properties` with `sdk.dir`)
+- `watchos/fmd-server-core/`: `swift test` (Swift 6.1.2; works on Linux —
+  Argon2 is vendored C, crypto via swift-crypto)
 
 ## Security notes
 

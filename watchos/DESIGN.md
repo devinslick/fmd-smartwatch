@@ -75,5 +75,5 @@ deployment) — but never a relay.
 2. Spike: `xcodebuild` in the macOS VM; wireless deploy to a paired watch
 3. ~~Argon2 Swift package selection~~ → vendored C reference (CArgon2)
 4. Multi-device account UI (pick target device after login)
-5. Live-server integration test (point FmdClient at fmd.devinslick.com
-   from the VM or on-device; Linux crypto suite covers the rest)
+5. Live-server integration test (point FmdClient at your own FMD server
+   URL from the VM or on-device; Linux crypto suite covers the rest)

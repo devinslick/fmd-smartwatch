@@ -19,7 +19,33 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    // Same keystore story as android/: CI decodes the secret, local builds
+    // set FMD_KEYSTORE_FILE, else AGP default (no in-place update guarantee).
+    def keystoreFile = null
+    if (file('../debug.keystore').exists()) {
+        keystoreFile = file('../debug.keystore')
+    } else if (System.getenv('FMD_KEYSTORE_FILE') != null
+            && file(System.getenv('FMD_KEYSTORE_FILE')).exists()) {
+        keystoreFile = file(System.getenv('FMD_KEYSTORE_FILE'))
+    }
+
+    signingConfigs {
+        debug {
+            if (keystoreFile != null) {
+                storeFile keystoreFile
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+            }
+        }
+    }
+
     buildTypes {
+        debug {
+            if (keystoreFile != null) {
+                signingConfig signingConfigs.debug
+            }
+        }
         release {
             minifyEnabled false
         }

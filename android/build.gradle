@@ -25,14 +25,29 @@ android {
         }
     }
 
-    // Same keystore as always (was android/debug.keystore in the gradle-free
-    // build): CI builds update installed builds in place.
+    // Signing: the debug keystore is NOT committed (public repo). CI decodes
+    // the ANDROID_KEYSTORE_BASE64 secret into android/debug.keystore; local
+    // builds point FMD_KEYSTORE_FILE at a keystore of their own. When neither
+    // is present, AGP's default debug keystore applies (different signature —
+    // won't update installed builds in place).
+    def keystoreFile = null
+    if (file('debug.keystore').exists()) {
+        keystoreFile = file('debug.keystore')
+    } else {
+        def env = System.getenv('FMD_KEYSTORE_FILE')
+        if (env != null && file(env).exists()) {
+            keystoreFile = file(env)
+        }
+    }
+
     signingConfigs {
         debug {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            if (keystoreFile != null) {
+                storeFile keystoreFile
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+            }
         }
     }
 

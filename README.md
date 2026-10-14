@@ -143,11 +143,17 @@ Local builds:
 
 ## Security notes
 
-- The `RING` receiver is exported and unauthenticated: any app on the phone
+- `RING` receiver is exported and unauthenticated: any app on the phone
   can fire an FMD command (annoyance-only; the FMD pin never leaves the app).
-- `android/debug.keystore` is committed so CI builds update in place over the
-  installed app. **If this repo ever goes public, regenerate the keystore and
-  strip the old one** — anyone holding it could sign matching updates.
+- **Signing**: no keystore is committed (public repo). CI decodes a
+  keystore from the `ANDROID_KEYSTORE_BASE64` repo secret so official
+  builds update installed apps in place; contributors' local builds fall
+  back to AGP's default debug keystore (different signature — remove the
+  installed app before installing a local build over it). Set
+  `FMD_KEYSTORE_FILE` to sign local builds with your own key.
+- The Garmin Connect IQ SDK AAR is fetched at build time
+  (`android/fetch-garmin-aar.sh`, pinned snapshot) — Garmin's binary is
+  not redistributable, so it is never committed.
 - The PK2 companion wire contract (`io.rebble.pebblekit2.common` AIDL) is
   replicated from [pebble-dev/PebbleKitAndroid2](https://github.com/pebble-dev/PebbleKitAndroid2)
   (Apache-2.0) — a protocol reimplementation, no code copied.

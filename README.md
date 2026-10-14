@@ -40,7 +40,7 @@ bridge today, and links native-support MRs here as they open.
 | Garmin (Connect IQ) | — | idea | none |
 | Bangle.js | — | idea | none |
 | Amazfit (Zepp OS) | — | idea | none |
-| watchOS (Apple Watch) | — | idea | no Android↔watchOS link exists; the only conceivable path is the watch reaching the FMD server directly over its own LTE/Wi-Fi — never via the phone's Bluetooth |
+| watchOS (Apple Watch) | `watchos/` | 📐 design decided — see [DESIGN.md](watchos/DESIGN.md) | n/a — no phone link exists; the watch talks to the FMD server directly over its own LTE/Wi-Fi ([fmd-ios](watchos/DESIGN.md) would be the proper future entry, separate effort) |
 
 Until a platform's native support ships in an FMD release, that platform
 needs the bridge APK.

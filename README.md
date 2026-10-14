@@ -141,6 +141,14 @@ Local builds:
 - `watchos/fmd-server-core/`: `swift test` (Swift 6.1.2; works on Linux —
   Argon2 is vendored C, crypto via swift-crypto)
 
+## Contributing & license
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) — the short version: pick a
+platform you own hardware for, grab the `FMDRing-apk` CI artifact, follow
+that module's README, and report results in an issue. MIT licensed
+([LICENSE](LICENSE)); vendored third-party code (Argon2 reference) keeps
+its own license file.
+
 ## Security notes
 
 - `RING` receiver is exported and unauthenticated: any app on the phone

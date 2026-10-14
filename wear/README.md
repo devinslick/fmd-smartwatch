@@ -17,11 +17,25 @@ Galaxy Watch 5+ / any Wear OS 3+ watch. Two gradle modules:
 
 ## Data flow
 
+```mermaid
+flowchart TD
+    W["Watch — FMD Remote<br/>action list · tap fires<br/>status line shows results"]
+    DL["Wear Data Layer (MessageClient)<br/>over the watch's existing Wear/BT stack"]
+    B["Bridge: FmdWearListenerService<br/>advertises the fmd_bridge capability"]
+    FMD["FMD — parses & executes the command<br/>(ring · locate · lock · camera · …)"]
+    L["FMD notification listener"]
+
+    W -->|"MessageClient /fmd-cmd<br/>(command string, e.g. ring)"| DL
+    DL -->|"delivered to the listener service"| B
+    B -->|"posts the FMD command notification<br/>(trigger word + pin + command)"| L
+    L --> FMD
+
+    FMD -.->|"result via the notification's<br/>RemoteInput action"| RR["WearReplyReceiver"]
+    RR --> PN["phone notification (geo: map pin)"]
+    RR -.->|"MessageClient /fmd-result"| DL
+    DL -.->|"status line update"| W
 ```
-watch app --MessageClient /fmd-cmd "ring"--> Wear stack (BT) --> bridge service
-bridge --> notification "fmd <pin> ring" --> FMD executes --> RemoteInput result
-result --> WearReplyReceiver --> phone notification (geo: pin) + /fmd-result --> watch
-```
+
 
 ## Why a second phone app (for now)
 
